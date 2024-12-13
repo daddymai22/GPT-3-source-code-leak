@@ -1,0 +1,18 @@
+For the code provided to work properly, you will need Python 3.x. Specifically, Python 3.6 or higher is recommended, as it supports all the necessary libraries and syntax used in the script.
+
+Key Points:
+	•	Python 3.6+ is required for compatibility with f-strings, type hints, and other modern Python features used in the code.
+	•	The script uses the tkinter library for the graphical user interface, which is included by default in Python 3.x distributions.
+	•	The re module, which is also used in the code for regular expression matching, is part of Python’s standard library and is available in Python 3.x versions.
+
+How to Check Your Python Version:
+
+You can check your Python version by running the following command in your terminal or command prompt:
+
+python --version
+
+Or, if you’re using Python 3 explicitly:
+
+python3 --version
+
+If you’re using an older version of Python (like 2.x), you may need to upgrade to Python 3.
