@@ -1,0 +1,209 @@
+import tkinter as tk
+import time
+import random
+import re
+
+# Function to simulate a random delay between 10 and 20 seconds
+def simulate_delay():
+    delay = random.randint(10, 20)
+    time.sleep(delay)
+
+# Function to correct common spelling mistakes and informal contractions
+def correct_spelling(user_input):
+    corrections = {
+        "dont": "don't",
+        "wanna": "want to",
+        "gonna": "going to",
+        "yall": "you all",
+        "u": "you",
+        "ur": "your",
+        "im": "I'm",
+        "cant": "can't",
+        "woulda": "would have",
+        "shoulda": "should have",
+        "coulda": "could have",
+        "ain't": "isn't",
+        "gotta": "got to",
+        "idk": "I don't know",
+        "lol": "laughing out loud",
+        "btw": "by the way",
+        "brb": "be right back",
+        "ttyl": "talk to you later",
+        "fyi": "for your information",
+        "omg": "oh my god",
+        "lmao": "laughing my ass off",
+        "smh": "shaking my head",
+        "bff": "best friends forever",
+        "np": "no problem",
+        "ty": "thank you",
+        "pls": "please",
+        "thx": "thanks",
+        "plz": "please",
+        "gtg": "got to go",
+        "cya": "see you",
+        "imma": "I'm going to",
+        "yup": "yes",
+        "nah": "no",
+        "k": "okay",
+        "yo": "hello",
+        "sup": "what's up",
+        "ok": "okay",
+        "hru": "how are you",
+        "wyd": "what are you doing"
+    }
+    
+    # Replace informal contractions with corrected ones
+    for wrong, correct in corrections.items():
+        user_input = re.sub(rf'\b{wrong}\b', correct, user_input, flags=re.IGNORECASE)
+    
+    return user_input
+
+# List of inappropriate words (including the full N-word and "bitch")
+blacklist = [
+    "nigger", "bitch"
+]
+
+# Function to check for inappropriate language
+def check_blacklist(user_input):
+    for word in blacklist:
+        if word.lower() in user_input.lower():
+            return True
+    return False
+
+# Memory system to store context and preferences
+class Memory:
+    def __init__(self):
+        self.memory = {}
+
+    def remember(self, key, value):
+        self.memory[key] = value
+
+    def recall(self, key):
+        return self.memory.get(key, None)
+
+    def clear(self):
+        self.memory = {}
+
+# Function to generate a random name for the chatbot
+def generate_random_name():
+    names = ["Jack", "Alex", "Mia", "Sophia", "Oliver", "Liam", "Emma", "Noah", "Ava", "Isabella"]
+    return random.choice(names)
+
+# Simulate human-like responses based on user input
+def generate_response(user_input, memory, chatbot_name):
+    user_input = correct_spelling(user_input)
+    
+    # Simulate a delay before responding
+    simulate_delay()
+
+    # Check for inappropriate language
+    if check_blacklist(user_input):
+        return "Your input contains inappropriate language. The chat has been terminated. To start a new chat, please type 'start new chat'."
+    
+    # Personalization: Check if the user has mentioned their name or preferences
+    user_name = memory.recall("name")
+    if user_name and "name" in user_input.lower():
+        return f"Ah, so you want to know my name, {user_name}? Well, you can call me {chatbot_name}!"
+    
+    # Predefined responses based on keywords
+    if "how are you" in user_input.lower():
+        return f"I'm doing great, thanks for asking! How about you?"
+    elif "hello" in user_input.lower() or "hi" in user_input.lower():
+        return f"Hey there! How's it going? I'm {chatbot_name}."
+    elif "bye" in user_input.lower():
+        return "Goodbye! Take care, and let's chat again soon!"
+    elif "what's your name" in user_input.lower():
+        return f"I'm {chatbot_name}, your friendly chatbot!"
+    elif "thanks" in user_input.lower() or "thank you" in user_input.lower():
+        return "You're welcome! I'm happy to help."
+    elif "help" in user_input.lower():
+        return "Sure! What do you need help with?"
+    elif "weather" in user_input.lower():
+        return "I don't know the current weather, but you can check it out online. I hope it's nice!"
+    elif "favorite" in user_input.lower():
+        return "I don't have favorites, but I can help you discover new things you might like!"
+    else:
+        return "Hmm, that's interesting. Tell me more!"
+
+# Emotional Tone: Respond based on the user's input tone (e.g., cheerful, empathetic, etc.)
+def adjust_tone(user_input):
+    if "sad" in user_input.lower() or "upset" in user_input.lower():
+        return "I'm really sorry you're feeling this way. I'm here to listen if you want to talk."
+    elif "happy" in user_input.lower() or "excited" in user_input.lower():
+        return "That's awesome! I'm so glad to hear you're feeling good!"
+    else:
+        return "I hope you're having a good day!"
+
+# Function to start a new chat and reset memory
+def start_new_chat():
+    print("Starting a new chat... Resetting memory.")
+    memory = Memory()  # Clear memory
+    chatbot_name = generate_random_name()  # Assign a new random name
+    return memory, chatbot_name
+
+# Main function to run the chatbot with Tkinter interface
+def run_chat():
+    memory = Memory()  # Initialize memory
+    chatbot_name = generate_random_name()  # Generate random chatbot name
+
+    # Create the main window
+    root = tk.Tk()
+    root.title("Chatbot")
+
+    # Set the window size
+    root.geometry("400x600")
+
+    # Create a scrollable text area for the conversation
+    chat_history = tk.Text(root, height=25, width=50, wrap=tk.WORD, state=tk.DISABLED)
+    chat_history.pack(pady=10)
+
+    # Create an entry box for the user to type in
+    user_input_box = tk.Entry(root, width=50)
+    user_input_box.pack(pady=10)
+
+    # Function to handle sending a message
+    def send_message():
+        user_input = user_input_box.get()
+        if user_input.lower() == "start new chat":
+            memory, chatbot_name = start_new_chat()
+            chat_history.config(state=tk.NORMAL)
+            chat_history.insert(tk.END, "Starting a new chat... Type your message below.\n")
+            chat_history.config(state=tk.DISABLED)
+            user_input_box.delete(0, tk.END)
+            return
+
+        if user_input.lower() in ['exit', 'quit']:
+            chat_history.config(state=tk.NORMAL)
+            chat_history.insert(tk.END, "Chatbot: Goodbye! Take care!\n")
+            chat_history.config(state=tk.DISABLED)
+            user_input_box.delete(0, tk.END)
+            return
+
+        # Check for inappropriate language
+        if check_blacklist(user_input):
+            chat_history.config(state=tk.NORMAL)
+            chat_history.insert(tk.END, "Chatbot: Your input contains inappropriate language. The chat has been terminated.\n")
+            chat_history.insert(tk.END, "To start a new chat, type 'start new chat'.\n")
+            chat_history.config(state=tk.DISABLED)
+            user_input_box.delete(0, tk.END)
+            return
+
+        # Adjust tone and generate a response
+        tone_adjusted = adjust_tone(user_input)
+        response = generate_response(user_input, memory, chatbot_name)
+
+        chat_history.config(state=tk.NORMAL)
+        chat_history.insert(tk.END, f"You: {user_input}\n")
+        chat_history.insert(tk.END, f"Chatbot: {tone_adjusted} {response}\n")
+        chat_history.config(state=tk.DISABLED)
+        user_input_box.delete(0, tk.END)
+
+    # Create a send button
+    send_button = tk.Button(root, text="Send", command=send_message)
+    send_button.pack(pady=10)
+
+    # Start the Tkinter event loop
+    root.mainloop()
+
+if __name__ == "__main__":
+    run_chat()
